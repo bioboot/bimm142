@@ -1,0 +1,173 @@
+---
+title: "Machine Learning 1"
+author: 'Barry (PID: 911)'
+date: "10/21/2021"
+output: html_document
+---
+
+First up is clustering methods
+
+# Kmeans clustering
+
+The function in base R to do Kmeans clustering is called `kmeans()`.
+
+First make up some data where we know what the answer should be:
+
+```{r}
+tmp <- c(rnorm(30,-3), rnorm(30,3))
+x <- cbind(x=tmp, y=rev(tmp))
+plot(x)
+```
+
+> Q. Can we use kmeans() to cluster this data setting k to 2 and nstart to 20?
+
+```{r}
+km <- kmeans(x, centers = 2, nstart=20)
+km
+```
+
+> Q. How many points are in each cluster?
+
+```{r}
+km$size
+```
+
+> Q. What ‘component’ of your result object details cluster assignment/membership? 
+
+```{r}
+km$cluster
+```
+
+> Q. What ‘component’ of your result object details cluster center?
+
+```{r}
+km$centers
+```
+
+> Q. Plot x colored by the kmeans cluster assignment and 
+      add cluster centers as blue points
+
+```{r}
+plot(x, col=km$cluster)
+points(km$centers, col="blue", pch=15, cex=2)
+```
+
+# Hierarchical Clustering
+
+A big limitation with k-means is that we have to tell it K (the number of clusters we want).
+
+
+Analyze this same data with hclust()
+
+Demonstrate the use of dist(), hclust(), plot() 
+and cutree() functions to do clustering, 
+Generate dendrograms and return cluster assignment/
+membership vector...
+
+```{r}
+hc <- hclust( dist(x) )
+hc
+```
+
+There is a plot method for hclust result objects. Let's see it.
+
+```{r}
+plot(hc)
+```
+To get our cluster membership vector we have to do a wee bit more work. We have to "cut" the tree where we think it makes sense.  For this we use the `cutree()` function.
+
+```{r}
+cutree(hc, h=6)
+```
+You can also call `cutree()` setting k=the number of grps/clusters you want.
+
+```{r}
+grps <- cutree(hc, k=2)
+```
+
+Make our results plot
+
+```{r}
+plot(x, col=grps)
+```
+
+# Principal Component Analysis (PCA)
+
+
+Read data on food stuffs from the UK.
+
+```{r}
+url <- "https://tinyurl.com/UK-foods"
+x <- read.csv(url)
+```
+
+```{r}
+dim(x)
+```
+
+```{r}
+x
+```
+
+Pants! this should be 17 x 4 dimensions. We have an extra first column that we need to fix.
+
+One way
+```{r}
+rownames(x) <- x[,1]
+x <- x[,-1]
+head(x)
+```
+```{r}
+url <- "https://tinyurl.com/UK-foods"
+x <- read.csv(url, row.names=1)
+head(x)
+```
+
+Now we have the data looking good we want to explore it. We will use some conventional plots (barplots and pairs plots).
+
+```{r}
+barplot(as.matrix(x), col=rainbow(17))
+```
+
+The stacked barplot is not helpful.
+
+```{r}
+barplot(as.matrix(x), col=rainbow(17), beside=T)
+```
+
+```{r}
+pairs(x, col=rainbow(17), pch=16)
+```
+
+# PCA to the rescue!
+
+The main function in base R for PCA is `prcomp()`
+This want's the transpose of our data.
+
+```{r}
+pca <- prcomp(t(x))
+summary(pca)
+```
+
+```{r}
+attributes(pca)
+```
+
+
+```{r}
+plot( pca$x[,1], pca$x[,2] ) 
+```
+
+```{r}
+#
+```
+
+
+
+
+
+
+
+
+
+
