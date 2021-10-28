@@ -1,0 +1,134 @@
+---
+title: 'Class 09 Mini Project: Cancer Cell Data'
+author: 'Barry (PID: 911)'
+date: "10/28/2021"
+output: html_document
+---
+
+# Read the cancer cell data
+
+```{r}
+url <- "https://bioboot.github.io/bimm143_S20/class-material/WisconsinCancer.csv"
+
+# Download the data: wisc.df
+wisc.df <- read.csv(url, row.names=1)
+
+```
+
+Setup diagnoses vector and data frame for analysis
+```{r}
+wisc.data <- wisc.df[,-1]
+diagnosis <- as.factor(wisc.df$diagnosis)
+```
+
+# PCA with scalling
+
+```{r}
+wisc.pr <- prcomp(wisc.data, scale=TRUE)
+```
+
+## PCA score plot
+Quick PC1 vs PC2 plot
+```{r}
+plot(wisc.pr$x[,1:2], col=diagnosis)
+```
+
+
+# 3. Hierarchical clustering
+
+```{r}
+# Scale the wisc.data data: data.scaled
+data.scaled <- scale(wisc.data)
+data.dist <- dist(data.scaled)
+wisc.hclust <- hclust(data.dist)
+plot(wisc.hclust)
+```
+Cut the tree into 4 groups
+```{r}
+wisc.hclust.clusters <- cutree(wisc.hclust, k=4)
+```
+
+Compare to diagnosis results
+
+```{r}
+table(wisc.hclust.clusters, diagnosis)
+```
+
+# 5. Combining methods
+
+We take the results of our PCA analysis and cluster in this space `wisc.pr$x`
+
+```{r}
+summary(wisc.pr)
+```
+
+```{r}
+wisc.pc.hclust <- hclust( dist( wisc.pr$x[,1:3] ),
+                          method="ward.D2" )
+```
+
+Plot my dendrogram
+```{r}
+plot( wisc.pc.hclust )
+abline(h=60, col="red")
+```
+
+Cut the tree into k=2 groups
+
+```{r}
+grps <- cutree( wisc.pc.hclust, k=2)
+table(grps)
+```
+
+Cross table compare of diagnosis and my cluster groups
+
+```{r}
+table(diagnosis, grps)
+```
+
+# 6. Sensitivity/Specificity
+**Accuracy** What proportion did we get correct if we call cluster 1 M and cluster 2 B
+
+```{r}
+(333 + 179)/nrow(wisc.data)
+```
+
+
+**Sensitivity** refers to a test’s ability to correctly detect ill patients who do have the condition. In our example here the sensitivity is the total number of samples in the cluster identified as predominantly malignant (cancerous) divided by the total number of known malignant samples. In other words: TP/(TP+FN).
+
+```{r}
+179/(179+33)
+```
+
+
+**Specificity** relates to a test’s ability to correctly reject healthy patients without a condition. In our example specificity is the proportion of benign (not cancerous) samples in the cluster identified as predominantly benign that are known to be benign. In other words: TN/(TN+FN).
+
+```{r}
+333/(333+24)
+```
+
+# 7. Prediction
+
+Here we read some new data and use our PCA model to examine whether they most closely resemble M or B patients from our original dataset.
+
+```{r}
+# Read the new data
+url <- "https://tinyurl.com/new-samples-CSV"
+new <- read.csv(url)
+npc <- predict(wisc.pr, newdata=new)
+```
+
+Plot onto our PCA model
+```{r}
+plot(wisc.pr$x[,1:2], col=diagnosis)
+points(npc[,1], npc[,2], col="blue", pch=16, cex=3)
+text(npc[,1], npc[,2], labels = c(1,2), col="white")
+```
+
+
+
+
+
+
+
+

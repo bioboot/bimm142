@@ -139,6 +139,23 @@ barplot(as.matrix(x), col=rainbow(17), beside=T)
 pairs(x, col=rainbow(17), pch=16)
 ```
 
+```{r}
+x <- as.data.frame(x)
+x
+```
+
+```{r}
+library(tidyverse)
+y <- pivot_longer(x, cols=!X, names_to = "country", values_to="food")
+y
+#pivot_longer(x, cols=everything(), names_to = "country", values_to="food")
+```
+
+```{r}
+ggplot(y) + aes(x=food, y=X) + geom_col() + facet_wrap(~ country) + labs(y="", x="")
+```
+
+
 # PCA to the rescue!
 
 The main function in base R for PCA is `prcomp()`
@@ -159,12 +176,38 @@ plot( pca$x[,1], pca$x[,2] )
 ```
 
 ```{r}
-#
+barplot( pca$rotation[,1], las=2 )
 ```
 
 
+```{r}
+x <- as.data.frame(pca$rotation)
+head(x)
+```
+
+```{r}
+library(ggplot2)
+ggplot(x) + aes(x=rownames(x), y=PC1) + geom_col() + coord_flip()
+```
+```{r}
+ggplot(x) + 
+  aes(x=PC1, y=rownames(x)) + 
+  geom_col() + 
+  labs(x="PC1 loadings (variable contributions)", y="")
+```
 
 
+```{r}
+x <- as.data.frame(pca$x)
+ggplot(x) + 
+  aes(x=PC1, y=PC2, 
+      col=rownames(x), 
+      label=rownames(x)) + 
+  #geom_point(show.legend = FALSE) + 
+  geom_label(show.legend = FALSE) + 
+  expand_limits(x = c(-320,600), y=c(-350,350)) +
+  theme()
+```
 
 
 
