@@ -1,0 +1,55 @@
+---
+title: "Play with r3dmol"
+author: 'Barry (PID: 911)'
+date: "11/1/2021"
+output: html_document
+---
+
+Now two viewers of interest:
+
+https://swsoyee.github.io/r3dmol/index.html
+https://github.com/nvelden/NGLVieweR
+
+
+```{r}
+library(bio3d)
+library(r3dmol)
+```
+
+```{r}
+pdb <- read.pdb("1hsg")
+```
+
+```{r}
+model <- r3dmol() %>%
+  m_add_model(data = m_bio3d(pdb)) %>%
+  m_set_style(style = m_style_cartoon(color = 'spectrum')) %>%
+  m_zoom_to()
+
+model
+```
+```{r}
+model %>% m_add_style(style = c(m_style_sphere()),
+                      sel = m_sel(resn = "MK1"))
+```
+```{r}
+modes <- nma(pdb)
+```
+```{r}
+plot(modes)
+```
+```{r}
+x <- mktrj.nma(modes, pdb=pdb, file="m1.pdb")
+```
+
+```{r}
+p <- read.pdb("m1.pdb")
+
+r3dmol() %>%
+  m_add_model(data = m_bio3d(p)) %>%
+  m_add_style(style = c(m_style_sphere()))
+  
+```
+## nglR
+
+https://github.com/nvelden/NGLVieweR
