@@ -1,6 +1,7 @@
 #' ---
 #' title: "Class 05 Data Visualization"
 #' author: "Barry Grant (PID 911)"
+#' output: github_document
 #' ---
 
 
@@ -64,7 +65,7 @@ ggplot(gapminder) +
 
 
 # Convert it to interactive plot
-library(plotly)
-ggplotly()
+#library(plotly)
+#ggplotly()
 
  
